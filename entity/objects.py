@@ -136,8 +136,43 @@ class Gun(Weapon):
 
 
 class Robber(Creature):
+
+    def get_barrier(self, directions, barriers):
+        if "right" in directions:
+            x = self._x + self.speed()
+        elif "left" in directions:
+            x = self._x - self.speed()
+        else:
+            x = self._x
+        if "up" in directions:
+            y = self._y - self.speed()
+        elif "down" in directions:
+            y = self._y + self.speed()
+        else:
+            y = self._y
+        for cords in barriers:
+            if self.squares_intersect((x, y), cords):
+                return cords
+        return None
+
+    def move(self, directions, barriers):
+        if len(directions) == 0:
+            return None
+        if self.can_go(directions, barriers):
+            return super().move(directions, barriers)
+        barrier_cords = self.get_barrier(directions, barriers)
+        if barrier_cords[-1] < self._y:
+            self._y += self.speed()
+        else:
+            self._y -= self.speed()
+        self._next_model()
+        return None
+
+
+
     def speed(self):
         return 3
+
     def move_to_player(self, player_cords, barriers):
         directions = []
         if player_cords[0] < self.get_cords()[0]:
